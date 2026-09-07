@@ -1,4 +1,5 @@
 import { buildWorktreeDragPreviewOffsets } from './worktree-drag-preview-offsets'
+import type { WorktreeFolderDropTarget } from './worktree-folder-drop-target'
 import {
   getWorktreeSidebarBoundaryDrop,
   type WorktreeSidebarDragRect
@@ -27,7 +28,10 @@ export type WorktreeSidebarStatusDropTarget = {
 }
 
 export type WorktreeSidebarTrackedStatusDropTarget = {
-  target: WorktreeSidebarStatusDropTarget & { lineageParentId: string | null }
+  target: WorktreeSidebarStatusDropTarget & {
+    lineageParentId: string | null
+    folderDrop: WorktreeFolderDropTarget | null
+  }
   preview: WorktreeSidebarDropPreview | null
   x: number
   y: number
@@ -73,20 +77,28 @@ function getWorktreeSidebarDragUnitRects(args: {
   })
 }
 
-function hasWorktreeSidebarStatusDropTarget(
-  target: WorktreeSidebarStatusDropTarget & { lineageParentId?: string | null }
-): boolean {
-  return target.isPinDrop || target.status !== null || (target.lineageParentId ?? null) !== null
+type WorktreeSidebarCommitDropTarget = WorktreeSidebarStatusDropTarget & {
+  lineageParentId?: string | null
+  folderDrop?: WorktreeFolderDropTarget | null
+}
+
+function hasWorktreeSidebarStatusDropTarget(target: WorktreeSidebarCommitDropTarget): boolean {
+  return (
+    target.isPinDrop ||
+    target.status !== null ||
+    (target.lineageParentId ?? null) !== null ||
+    (target.folderDrop ?? null) !== null
+  )
 }
 
 export function resolveWorktreeSidebarStatusDropCommitTarget(args: {
-  currentTarget: WorktreeSidebarStatusDropTarget & { lineageParentId?: string | null }
+  currentTarget: WorktreeSidebarCommitDropTarget
   currentPreview: WorktreeSidebarDropPreview | null
   latestTrackedTarget: WorktreeSidebarTrackedStatusDropTarget | null
   x: number
   y: number
 }): {
-  target: WorktreeSidebarStatusDropTarget & { lineageParentId?: string | null }
+  target: WorktreeSidebarCommitDropTarget
   preview: WorktreeSidebarDropPreview | null
 } {
   if (hasWorktreeSidebarStatusDropTarget(args.currentTarget)) {

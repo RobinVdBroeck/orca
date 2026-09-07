@@ -42,6 +42,10 @@ import {
 } from './header-event-guards'
 import type { WorktreeSidebarHeaderDrag } from '../drag/use-header-drag'
 import { getWorktreeOptionId } from './option-dom'
+import {
+  WORKTREE_FOLDER_DROP_REPO_ID_ATTR,
+  getWorktreeFolderDropTargetKey
+} from '../../worktree-folder-drop-target'
 
 export type SectionHeaderRowContext = {
   groupBy: WorktreeGroupBy
@@ -52,6 +56,8 @@ export type SectionHeaderRowContext = {
   highlightedRevealRowKey: string | null
   dragOverStatus: WorkspaceStatus | null
   pinDragOver: boolean
+  /** See getWorktreeFolderDropTargetKey; `root:<repoId>` marks a repo header. */
+  folderDragOverKey: string | null
   headerDrag: WorktreeSidebarHeaderDrag
   getCachedFolderWorkspacePathStatus: (request: {
     scope: 'project-group'
@@ -172,6 +178,12 @@ export function renderWorktreeSectionHeaderRow(args: {
       })
     : null
   const isHeaderCollapsed = ctx.collapsedGroups.has(row.key)
+  // Why: dropping a card on its repo header moves it back out of a sidebar folder.
+  const folderRootDropTarget =
+    isRepoHeader && projectIdForHeader ? { repoId: projectIdForHeader, folderId: null } : null
+  const isFolderRootDropOver =
+    folderRootDropTarget !== null &&
+    ctx.folderDragOverKey === getWorktreeFolderDropTargetKey(folderRootDropTarget)
   // Why: repo/project/status/pinned share compact section chrome; flat "All" stays a simple label.
   const showHeaderCollapseAffordance =
     row.count > 0 &&
@@ -229,6 +241,9 @@ export function renderWorktreeSectionHeaderRow(args: {
         data-workspace-status-drop-target={headerWorkspaceStatus ? '' : undefined}
         data-workspace-status={headerWorkspaceStatus ?? undefined}
         data-workspace-pin-drop-target={isPinnedHeader ? '' : undefined}
+        {...(folderRootDropTarget
+          ? { [WORKTREE_FOLDER_DROP_REPO_ID_ATTR]: folderRootDropTarget.repoId }
+          : {})}
         className={cn(
           // Why: no row-level grab — only the title surface below shows the hand;
           // actions use cursor-pointer so … / + never look reorderable.
@@ -243,6 +258,8 @@ export function renderWorktreeSectionHeaderRow(args: {
             'rounded-md bg-worktree-sidebar-accent ring-1 ring-worktree-sidebar-ring/40',
           isPinnedHeader &&
             ctx.pinDragOver &&
+            'rounded-md bg-worktree-sidebar-accent ring-1 ring-worktree-sidebar-ring/40',
+          isFolderRootDropOver &&
             'rounded-md bg-worktree-sidebar-accent ring-1 ring-worktree-sidebar-ring/40',
           row.repo && 'overflow-hidden'
         )}

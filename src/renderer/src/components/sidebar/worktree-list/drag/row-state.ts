@@ -1,5 +1,6 @@
 import type { WorkspaceKanbanCardTrackedDropTarget } from '../../workspace-kanban-card-pointer-drag-dom'
 import type { WorktreeSidebarDragRect } from '../../worktree-sidebar-drag-autoscroll'
+import type { WorktreeFolderDropTarget } from '../../worktree-folder-drop-target'
 import type {
   WorktreeSidebarDropPreview,
   WorktreeSidebarStatusDropTarget,
@@ -51,12 +52,14 @@ export type WorktreePointerDrag = {
 
 export type WorktreeSidebarLineageDropTarget = WorktreeSidebarStatusDropTarget & {
   lineageParentId: string | null
+  folderDrop: WorktreeFolderDropTarget | null
 }
 
 export const NO_WORKTREE_SIDEBAR_DROP_TARGET: WorktreeSidebarLineageDropTarget = {
   status: null,
   isPinDrop: false,
-  lineageParentId: null
+  lineageParentId: null,
+  folderDrop: null
 }
 
 export function areWorktreeDragPreviewOffsetsEqual(
@@ -83,7 +86,7 @@ export function updateLatestWorktreeStatusDropTarget(
   preview: WorktreeSidebarDropPreview | null
 ): void {
   drag.latestStatusDropTarget =
-    target.status || target.isPinDrop || target.lineageParentId
+    target.status || target.isPinDrop || target.lineageParentId || target.folderDrop
       ? {
           target,
           preview,

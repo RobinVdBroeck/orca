@@ -35,6 +35,7 @@ import { translate } from '@/i18n/i18n'
 import { useOptionalShortcutLabel } from '@/hooks/useShortcutLabel'
 import type { WorktreeContextMenuModel } from './use-worktree-context-menu-model'
 import { WorktreeStatusMenuItems } from './WorktreeStatusMenuItems'
+import { WorktreeFolderMenuItems } from './WorktreeFolderMenuItems'
 import { WorktreeContextMenuOverlays } from './WorktreeContextMenuOverlays'
 import {
   CLOSE_ALL_CONTEXT_MENUS_EVENT,
@@ -201,6 +202,7 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
                       'Mark Unread'
                     )}
               </DropdownMenuItem>
+              <WorktreeFolderMenuItems model={model} disabled={isDeleting} />
               {repo ? (
                 <>
                   <DropdownMenuSeparator />
@@ -277,16 +279,21 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
               )}
             </>
           )}
-          {isMultiContext && hasAnyContextLineage ? (
+          {isMultiContext ? (
             <>
-              <DropdownMenuItem onSelect={handleRemoveParentLink} disabled={deletingContext}>
-                <Unlink className="size-3.5" />
-                {translate(
-                  'auto.components.sidebar.WorktreeContextMenu.579b1a8e61',
-                  'Remove from Parent'
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              <WorktreeFolderMenuItems model={model} disabled={deletingContext} />
+              {hasAnyContextLineage ? (
+                <DropdownMenuItem onSelect={handleRemoveParentLink} disabled={deletingContext}>
+                  <Unlink className="size-3.5" />
+                  {translate(
+                    'auto.components.sidebar.WorktreeContextMenu.579b1a8e61',
+                    'Remove from Parent'
+                  )}
+                </DropdownMenuItem>
+              ) : null}
+              {hasAnyContextLineage || model.canMoveToWorktreeFolder ? (
+                <DropdownMenuSeparator />
+              ) : null}
             </>
           ) : null}
 

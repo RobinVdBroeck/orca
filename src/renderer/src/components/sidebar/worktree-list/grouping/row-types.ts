@@ -14,6 +14,14 @@ export function getPinnedWorktreeDisplayPolicy(
   return settings?.showPinnedWorktreesInGroups === true ? 'duplicate-in-groups' : 'single-location'
 }
 
+/** A sidebar folder header nested under a repo section; only set in repo grouping. */
+export type WorktreeFolderHeaderInfo = {
+  id: string
+  name: string
+  repoId: string
+  repo: Repo | undefined
+}
+
 export type GroupHeaderRow = {
   type: 'header'
   key: string
@@ -22,6 +30,7 @@ export type GroupHeaderRow = {
   tone: string
   icon?: React.ComponentType<{ className?: string }>
   repo?: Repo
+  worktreeFolder?: WorktreeFolderHeaderInfo
   projectGroup?: ProjectGroup | { id: null; name: 'Ungrouped'; tabOrder: number }
   projectGroupDepth?: number
   hostId?: ExecutionHostId

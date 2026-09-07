@@ -26,6 +26,7 @@ import { NOOP_WORKSPACE_BOARD_DRAG_PREVIEW_CALLBACK } from './worktree-list/drag
 import { useAgentSendTargetWorktreeId } from './worktree-list/listing/use-agent-send-target'
 import { useEffectiveCollapsedGroups } from './worktree-list/listing/use-collapsed-groups'
 import { useProjectGroupDialogs } from './worktree-list/rows/use-project-group-dialogs'
+import { useWorktreeFolderDialogs } from './worktree-list/rows/use-worktree-folder-dialogs'
 import { useSidebarExternalWorktreeCards } from './worktree-list/listing/use-external-worktree-cards'
 import { useSidebarHostVisibleScope } from './worktree-list/listing/use-host-visible-scope'
 import { useSidebarRevealRequests } from './worktree-list/navigation/use-reveal-requests'
@@ -85,6 +86,7 @@ const WorktreeList = React.memo(function WorktreeList({
   const clearPendingRevealSidebarRow = useAppStore((s) => s.clearPendingRevealSidebarRow)
   const collapsedGroups = useAppStore((s) => s.collapsedGroups)
   const toggleGroup = useAppStore((s) => s.toggleCollapsedGroup)
+  const sidebarWorktreeFolderIdByWorktree = useAppStore((s) => s.sidebarWorktreeFolderIdByWorktree)
   const projectGroups = useAppStore((s) => s.projectGroups ?? EMPTY_PROJECT_GROUPS)
   const folderWorkspaces = useAppStore((s) => s.folderWorkspaces)
   const settings = useAppStore((s) => s.settings)
@@ -134,7 +136,8 @@ const WorktreeList = React.memo(function WorktreeList({
     projectGroups,
     projectGrouping,
     folderWorkspaces,
-    defaultHostId
+    defaultHostId,
+    sidebarWorktreeFolderIdByWorktree
   })
   const visibleScope = useSidebarHostVisibleScope({
     filterState,
@@ -185,6 +188,7 @@ const WorktreeList = React.memo(function WorktreeList({
     sortBy
   })
   const projectGroupDialogs = useProjectGroupDialogs({ repos, repoMap, projectGroups })
+  const worktreeFolderDialogs = useWorktreeFolderDialogs()
 
   const handleImmediateWorktreeActivate = useCallback((worktreeId: string, rowKey?: string) => {
     // Why: re-rendering the virtualized sidebar on the pointer path adds visible latency; mutate the row directly and let store state reconcile after.
@@ -262,6 +266,7 @@ const WorktreeList = React.memo(function WorktreeList({
     <>
       <SidebarWorktreeListDialogs
         dialogs={projectGroupDialogs}
+        folderDialogs={worktreeFolderDialogs}
         repos={repos}
         settings={settings}
         suppressExternalWorktreeInboxRepoId={
@@ -312,6 +317,9 @@ const WorktreeList = React.memo(function WorktreeList({
         handleRenameProjectGroup={projectGroupDialogs.handleRenameProjectGroup}
         handleDeleteProjectGroup={projectGroupDialogs.handleDeleteProjectGroup}
         handleCreateFolderWorkspace={handleCreateFolderWorkspace}
+        handleCreateWorktreeFolder={worktreeFolderDialogs.handleCreateWorktreeFolder}
+        handleRenameWorktreeFolder={worktreeFolderDialogs.handleRenameWorktreeFolder}
+        handleDeleteWorktreeFolder={worktreeFolderDialogs.handleDeleteWorktreeFolder}
         activeModal={activeModal}
         pendingRevealWorktree={pendingRevealWorktree}
         pendingRevealSidebarRow={pendingRevealSidebarRow}

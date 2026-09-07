@@ -178,6 +178,7 @@ export function usePendingSidebarReveal(args: PendingSidebarRevealArgs): void {
     pinnedDisplayPolicy,
     args.projectGrouping,
     args.projectGroups,
+    args.sidebarWorktreeFolderIdByWorktree,
     pendingRevealRetryTick,
     flashRevealedRow,
     markRevealScroll,

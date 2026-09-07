@@ -1,11 +1,20 @@
 import type { PersistedUIState } from '../../../../../shared/persisted-ui-state-types'
-import type { TaskResumeState, TaskViewPresetId } from '../../../../../shared/ui-chrome-types'
+import type {
+  StatusBarItem,
+  TaskResumeState,
+  TaskViewPresetId
+} from '../../../../../shared/ui-chrome-types'
 import type { FeatureInteractionState } from '../../../../../shared/feature-interactions'
 import type { ContextualTourId } from '../../../../../shared/contextual-tours'
 import { normalizeFeatureInteractions } from '../../../../../shared/feature-interactions'
 import { normalizeContextualTourIds } from '../../../../../shared/contextual-tours'
+import {
+  normalizeSidebarWorktreeFolderIdByWorktree,
+  normalizeSidebarWorktreeFoldersByRepoId
+} from '../../../../../shared/sidebar-worktree-folders'
 import type { UISlice } from './ui-slice-contract'
 import {
+  migrateStatusBarItems,
   sanitizeAcknowledgedAgentsByPaneKey,
   sanitizeActivityClearedAtByPaneKey,
   sanitizePaneKeyTimestampRecord
@@ -137,6 +146,49 @@ export function mergeContextualTourSeenIds(
     merged.add(id)
   }
   return [...merged]
+}
+
+const DEFAULT_ON_STATUS_BAR_ITEMS = [
+  ['_portsStatusBarDefaultAdded', 'ports'],
+  ['_kimiStatusBarDefaultAdded', 'kimi'],
+  ['_minimaxStatusBarDefaultAdded', 'minimax'],
+  ['_antigravityStatusBarDefaultAdded', 'antigravity'],
+  ['_grokStatusBarDefaultAdded', 'grok']
+] as const satisfies readonly (readonly [keyof PersistedUIState, StatusBarItem])[]
+
+/** One-shot default-on items: added once per flag, then the flag is stamped so a later removal sticks. */
+export function hydrateStatusBarItems(ui: PersistedUIState): StatusBarItem[] {
+  let items = migrateStatusBarItems(ui.statusBarItems)
+  for (const [flag, item] of DEFAULT_ON_STATUS_BAR_ITEMS) {
+    if (!ui[flag] && !items.includes(item)) {
+      items = [...items, item]
+    }
+  }
+  if (typeof window !== 'undefined' && DEFAULT_ON_STATUS_BAR_ITEMS.some(([flag]) => !ui[flag])) {
+    window.api.ui
+      .set({
+        statusBarItems: items,
+        ...Object.fromEntries(DEFAULT_ON_STATUS_BAR_ITEMS.map(([flag]) => [flag, true]))
+      })
+      .catch(console.error)
+  }
+  return items
+}
+
+/** Folders first, so memberships pointing at unknown folders fall back to the root. */
+export function hydrateSidebarWorktreeFolders(
+  ui: PersistedUIState
+): Pick<UISlice, 'sidebarWorktreeFoldersByRepoId' | 'sidebarWorktreeFolderIdByWorktree'> {
+  const sidebarWorktreeFoldersByRepoId = normalizeSidebarWorktreeFoldersByRepoId(
+    ui.sidebarWorktreeFoldersByRepoId
+  )
+  return {
+    sidebarWorktreeFoldersByRepoId,
+    sidebarWorktreeFolderIdByWorktree: normalizeSidebarWorktreeFolderIdByWorktree(
+      ui.sidebarWorktreeFolderIdByWorktree,
+      sidebarWorktreeFoldersByRepoId
+    )
+  }
 }
 
 /** Stale acks/marks are inert (paneKey reuse beats them via stateStartedAt); the sanitizers only bound growth past HYDRATE_MAX_AGE_MS. */

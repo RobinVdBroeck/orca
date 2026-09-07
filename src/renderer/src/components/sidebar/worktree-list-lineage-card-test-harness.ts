@@ -35,6 +35,8 @@ export async function renderWorktreeListMarkup(): Promise<string> {
 export function createAppStoreModuleMock(): Record<string, unknown> {
   const getMockState = (): Record<string, unknown> => ({
     detectedWorktreesByRepo: {},
+    sidebarWorktreeFoldersByRepoId: {},
+    sidebarWorktreeFolderIdByWorktree: {},
     ...mockStore.state
   })
   const useAppStore = ((selector: (state: Record<string, unknown>) => unknown) =>

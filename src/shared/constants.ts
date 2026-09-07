@@ -269,6 +269,8 @@ export function getDefaultUIState(): PersistedUIState {
     hideWorkspacesFromOtherDevices: false,
     alwaysShowDefaultBranchWorkspace: true,
     showDotfilesByWorktree: {},
+    sidebarWorktreeFoldersByRepoId: {},
+    sidebarWorktreeFolderIdByWorktree: {},
     filterRepoIds: [],
     agentsVisibleHostIds: null,
     agentsFilterRepoIds: [],

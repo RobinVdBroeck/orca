@@ -22,7 +22,11 @@ import type { NewExternalWorktreesInboxActionState } from '../../new-external-wo
 import type { WorktreeDragGroup } from '../../worktree-manual-order'
 import type { WorktreeStatusDropAtIndexArgs } from '../drag/drop-commit-context'
 import type { ProjectGroupingModel } from '../grouping/project-grouping'
-import type { PinnedWorktreeDisplayPolicy, WorktreeGroupBy } from '../grouping/row-types'
+import type {
+  PinnedWorktreeDisplayPolicy,
+  WorktreeFolderHeaderInfo,
+  WorktreeGroupBy
+} from '../grouping/row-types'
 
 export const EMPTY_PROJECT_GROUPS: readonly ProjectGroup[] = []
 export type VirtualizedWorktreeViewportProps = {
@@ -50,6 +54,9 @@ export type VirtualizedWorktreeViewportProps = {
   handleRenameProjectGroup: (groupId: string, currentName: string, hostId?: ExecutionHostId) => void
   handleDeleteProjectGroup: (groupId: string, groupName: string, hostId?: ExecutionHostId) => void
   handleCreateFolderWorkspace: (projectGroup: ProjectGroup) => void
+  handleCreateWorktreeFolder: (repo: Repo) => void
+  handleRenameWorktreeFolder: (folder: WorktreeFolderHeaderInfo) => void
+  handleDeleteWorktreeFolder: (folder: WorktreeFolderHeaderInfo) => void
   activeModal: string
   pendingRevealWorktree: PendingSidebarWorktreeReveal | null
   pendingRevealSidebarRow: PendingSidebarRowReveal | null

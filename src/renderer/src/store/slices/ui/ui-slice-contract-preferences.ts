@@ -13,6 +13,11 @@ import type {
   VisibleWorkspaceHostIds
 } from '../../../../../shared/ui-chrome-types'
 import type { UsagePercentageDisplay } from '../../../../../shared/usage-percentage-display'
+import type {
+  SidebarWorktreeFolder,
+  SidebarWorktreeFolderIdByWorktree,
+  SidebarWorktreeFoldersByRepoId
+} from '../../../../../shared/sidebar-worktree-folders'
 import type { AutomationHostFilter } from '../../../../../shared/automation-host-filter'
 import type { WorkspaceStatusDefinition } from '../../../../../shared/worktree/types'
 import type { WorkspacePortScanResult } from '../../../../../shared/workspace-ports'
@@ -62,6 +67,17 @@ export type UISlicePreferences = {
   showDotfilesByWorktree: Record<string, boolean>
   setShowDotfilesForWorktree: (worktreeId: string, showDotfiles: boolean) => void
   toggleShowDotfilesForWorktree: (worktreeId: string) => void
+  /** Sidebar folders per project; rides the debounced persisted-UI writer. */
+  sidebarWorktreeFoldersByRepoId: SidebarWorktreeFoldersByRepoId
+  sidebarWorktreeFolderIdByWorktree: SidebarWorktreeFolderIdByWorktree
+  createSidebarWorktreeFolder: (repoId: string, name: string) => SidebarWorktreeFolder | null
+  renameSidebarWorktreeFolder: (folderId: string, name: string) => void
+  /** Members return to the project root. */
+  deleteSidebarWorktreeFolder: (folderId: string) => void
+  setSidebarWorktreeFolderForWorktrees: (
+    worktreeIds: readonly string[],
+    folderId: string | null
+  ) => void
   filterRepoIds: readonly string[]
   setFilterRepoIds: (ids: readonly string[]) => void
   /** Agents-view scope filters, independent from workspace navigation filters. */

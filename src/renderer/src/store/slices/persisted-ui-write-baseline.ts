@@ -1,4 +1,8 @@
 import type { PersistedUIState } from '../../../../shared/persisted-ui-state-types'
+import type {
+  SidebarWorktreeFolderIdByWorktree,
+  SidebarWorktreeFoldersByRepoId
+} from '../../../../shared/sidebar-worktree-folders'
 
 /**
  * Mirror-shaped snapshot of the fields the debounced persisted-UI writer owns.
@@ -27,6 +31,8 @@ export type PersistedUIWriteBaseline = {
   hideWorkspacesFromOtherDevices: boolean
   alwaysShowDefaultBranchWorkspace: boolean
   showDotfilesByWorktree: Record<string, boolean>
+  sidebarWorktreeFoldersByRepoId: SidebarWorktreeFoldersByRepoId
+  sidebarWorktreeFolderIdByWorktree: SidebarWorktreeFolderIdByWorktree
   filterRepoIds: readonly string[]
   acknowledgedAgentsByPaneKey: Record<string, number>
   activityClearedAtByPaneKey: Record<string, number>
@@ -56,6 +62,8 @@ const PERSISTED_UI_WRITE_BASELINE_FIELD_SET = {
   hideWorkspacesFromOtherDevices: true,
   alwaysShowDefaultBranchWorkspace: true,
   showDotfilesByWorktree: true,
+  sidebarWorktreeFoldersByRepoId: true,
+  sidebarWorktreeFolderIdByWorktree: true,
   filterRepoIds: true,
   acknowledgedAgentsByPaneKey: true,
   activityClearedAtByPaneKey: true,
@@ -101,6 +109,8 @@ function writeFieldEqual(field: keyof PersistedUIWriteBaseline, a: unknown, b: u
   }
   if (
     field === 'showDotfilesByWorktree' ||
+    field === 'sidebarWorktreeFoldersByRepoId' ||
+    field === 'sidebarWorktreeFolderIdByWorktree' ||
     field === 'acknowledgedAgentsByPaneKey' ||
     field === 'activityClearedAtByPaneKey' ||
     field === 'manuallyUnreadTurnsByPaneKey'

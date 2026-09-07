@@ -13,6 +13,7 @@ import type {
   WorktreeStatusDropAtIndexArgs
 } from './drop-commit-context'
 import type { WorktreeSidebarStatusDropTarget } from '../../worktree-sidebar-drop-preview'
+import type { WorktreeFolderDropTarget } from '../../worktree-folder-drop-target'
 import { NO_WORKTREE_SIDEBAR_DROP_TARGET, type WorktreePointerDrag } from './row-state'
 
 type PointerDropCommitArgs = {
@@ -25,12 +26,19 @@ type PointerDropCommitArgs = {
 
 function commitStatusOrPinDrop(
   args: PointerDropCommitArgs,
-  target: WorktreeSidebarStatusDropTarget & { lineageParentId?: string | null },
+  target: WorktreeSidebarStatusDropTarget & {
+    lineageParentId?: string | null
+    folderDrop?: WorktreeFolderDropTarget | null
+  },
   dropIndex: number | null
 ): void {
   const { drag, ctx } = args
   if (target.isPinDrop) {
     ctx.onPinWorktrees(drag.draggedIds)
+    return
+  }
+  if (target.folderDrop) {
+    ctx.commitWorktreeFolderDrop(drag.draggedIds, target.folderDrop)
     return
   }
   if (!target.status) {
@@ -80,7 +88,7 @@ export function commitWorktreePointerDrop(args: PointerDropCommitArgs): void {
       groups: getWorkspaceKanbanSidebarDropGroups()
     })
   } else {
-    const preferredStatusTarget = ctx.getEligibleLineageDropTarget(
+    const preferredStatusTarget = ctx.getEligibleDropTarget(
       ctx.scrollRef.current
         ? getPointerDropStatusTarget({
             container: ctx.scrollRef.current,

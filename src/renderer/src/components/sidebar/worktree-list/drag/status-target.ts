@@ -4,6 +4,10 @@ import type {
 } from '../../../../../../shared/worktree/types'
 import { getWorkspaceStatusFromGroupKey } from '../../workspace-status'
 import { getWorktreeLineageDropTargetId } from '../../worktree-lineage-drag-drop'
+import {
+  readWorktreeFolderDropTarget,
+  type WorktreeFolderDropTarget
+} from '../../worktree-folder-drop-target'
 import type { WorktreeSidebarStatusDropTarget } from '../../worktree-sidebar-drop-preview'
 import { NO_WORKTREE_SIDEBAR_DROP_TARGET, type WorktreeSidebarLineageDropTarget } from './row-state'
 
@@ -18,7 +22,7 @@ export function getPointerDropStatusTarget(args: {
   }
   const pinTarget = target.closest<HTMLElement>('[data-workspace-pin-drop-target]')
   if (pinTarget && args.container.contains(pinTarget)) {
-    return { status: null, isPinDrop: true, lineageParentId: null }
+    return { status: null, isPinDrop: true, lineageParentId: null, folderDrop: null }
   }
   const lineageParentId = getWorktreeLineageDropTargetId({
     container: args.container,
@@ -32,16 +36,17 @@ export function getPointerDropStatusTarget(args: {
         ? ((statusTarget.dataset.workspaceStatus as WorkspaceStatus | undefined) ?? null)
         : null,
     isPinDrop: false,
-    lineageParentId
+    lineageParentId,
+    folderDrop: readWorktreeFolderDropTarget(args.container, target)
   }
 }
 
 export function shouldPreferSidebarStatusDropTarget(args: {
   sourceGroupKey: string
-  target: WorktreeSidebarStatusDropTarget
+  target: WorktreeSidebarStatusDropTarget & { folderDrop?: WorktreeFolderDropTarget | null }
   workspaceStatuses: readonly WorkspaceStatusDefinition[]
 }): boolean {
-  if (args.target.isPinDrop) {
+  if (args.target.isPinDrop || args.target.folderDrop) {
     return true
   }
   if (!args.target.status) {

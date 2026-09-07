@@ -15,10 +15,14 @@
   <sub><a href="docs/readme/README.zh-CN.md">中文</a> · <a href="docs/readme/README.ja.md">日本語</a> · <a href="docs/readme/README.ko.md">한국어</a> · <a href="docs/readme/README.es.md">Español</a> · <a href="docs/readme/README.fr.md">Français</a> · <a href="docs/readme/README.pt.md">Português</a></sub>
 </p>
 
+> **Fork notice:** this is [RobinVdBroeck/orca](https://github.com/RobinVdBroeck/orca), a fork of [stablyai/orca](https://github.com/stablyai/orca) based on `v1.4.197` that adds **sidebar folders**: group a project's workspaces under named folders (for example `triage`, `reviews`, `features`) via the project header menu, the workspace context menu, or drag and drop. Folders are client-side only and never change branch names.
+
 <p align="center">
   <strong>The AI Orchestrator for 100x builders.</strong><br/>
   Run Codex, ClaudeCode, OpenCode or Pi side-by-side — each in its own worktree, tracked in one place.
 </p>
+
+> **Fork notice.** This is [RobinVdBroeck/orca](https://github.com/RobinVdBroeck/orca), a fork of [stablyai/orca](https://github.com/stablyai/orca) based on the latest stable release. It adds **sidebar folders**: group a project's workspaces under named folders such as `triage`, `reviews`, or `features`. Create a folder from the project header menu or a workspace's `Move to folder` menu, drag workspaces into folders or back onto the project header, and collapse folders. Folders are a local sidebar preference and do not touch branch names.
 
 <h3 align="center"><a href="https://onorca.dev/download"><ins>Download Orca</ins></a></h3>
 

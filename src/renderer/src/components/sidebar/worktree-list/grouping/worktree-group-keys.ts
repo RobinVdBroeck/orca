@@ -4,7 +4,13 @@ import type { WorkspaceStatusDefinition, Worktree } from '../../../../../../shar
 import { getWorkspaceStatus, getWorkspaceStatusGroupKey } from '../../workspace-status'
 import { cloneDefaultWorkspaceStatuses } from '../../../../../../shared/workspace-statuses'
 import type { AppState } from '../../../../store/types'
-import { ALL_GROUP_KEY, getPRGroupKey, getProjectGroupHeaderKey } from './group-keys'
+import type { SidebarWorktreeFolderIdByWorktree } from '../../../../../../shared/sidebar-worktree-folders'
+import {
+  ALL_GROUP_KEY,
+  getPRGroupKey,
+  getProjectGroupHeaderKey,
+  getWorktreeFolderGroupKey
+} from './group-keys'
 import { buildProjectGroupingIndex, getProjectGroupingForRepo } from './project-grouping'
 import type { ProjectGroupingModel } from './project-grouping'
 import type { WorktreeGroupBy } from './row-types'
@@ -42,7 +48,8 @@ export function getGroupKeysForWorktree(
   workspaceStatuses: readonly WorkspaceStatusDefinition[] = cloneDefaultWorkspaceStatuses(),
   settings?: AppState['settings'],
   projectGroups: readonly ProjectGroup[] = [],
-  projectGrouping?: ProjectGroupingModel
+  projectGrouping?: ProjectGroupingModel,
+  sidebarFolderIdByWorktree?: SidebarWorktreeFolderIdByWorktree
 ): string[] {
   const groupKey = getGroupKeyForWorktree(
     groupBy,
@@ -76,5 +83,10 @@ export function getGroupKeysForWorktree(
     const parentId = group.parentGroupId ?? null
     currentGroupId = parentId && groupsById.has(parentId) ? parentId : null
   }
-  return [...groupIds.map((id) => getProjectGroupHeaderKey(id)), groupKey]
+  const folderId = sidebarFolderIdByWorktree?.[worktree.id]
+  return [
+    ...groupIds.map((id) => getProjectGroupHeaderKey(id)),
+    groupKey,
+    ...(folderId ? [getWorktreeFolderGroupKey(folderId)] : [])
+  ]
 }

@@ -14,6 +14,7 @@ import { getHostDisplayLabelOverrides } from '../../../../../../shared/host-sett
 import { buildRows } from '../grouping/build-rows'
 import type { ProjectGroupingModel } from '../grouping/project-grouping'
 import type { PinnedWorktreeDisplayPolicy, Row, WorktreeGroupBy } from '../grouping/row-types'
+import type { SidebarWorktreeFolderModel } from '../grouping/worktree-folder-sections'
 import { getLogicalRepoOrderRankById } from '../../project-header-drop'
 import { getEmptyProjectPlaceholderRepoIds } from '../../empty-project-placeholder-repos'
 import { addHostSectionRows } from '../../host-section-rows'
@@ -77,6 +78,15 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
   const runtimeStatusByEnvironmentId = useAppStore((s) => s.runtimeStatusByEnvironmentId)
   const workspaceHostOrder = useAppStore((s) => s.workspaceHostOrder)
   const setWorkspaceHostOrder = useAppStore((s) => s.setWorkspaceHostOrder)
+  const sidebarWorktreeFoldersByRepoId = useAppStore((s) => s.sidebarWorktreeFoldersByRepoId)
+  const sidebarWorktreeFolderIdByWorktree = useAppStore((s) => s.sidebarWorktreeFolderIdByWorktree)
+  const worktreeFolders = useMemo<SidebarWorktreeFolderModel>(
+    () => ({
+      foldersByRepoId: sidebarWorktreeFoldersByRepoId,
+      folderIdByWorktree: sidebarWorktreeFolderIdByWorktree
+    }),
+    [sidebarWorktreeFoldersByRepoId, sidebarWorktreeFolderIdByWorktree]
+  )
 
   // Why: manual header order is bound to state.repos; Recent/Smart derive order from the sorted worktree stream.
   const repoOrder = useMemo(
@@ -165,7 +175,8 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
         args.visibleFolderWorkspacesForRows,
         hostLabelById,
         defaultHostId,
-        args.pinnedDisplayPolicy
+        args.pinnedDisplayPolicy,
+        worktreeFolders
       ),
     [
       args.groupBy,
@@ -188,7 +199,8 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
       args.newExternalWorktreesInboxByRepo,
       pendingCreations,
       hostLabelById,
-      args.pinnedDisplayPolicy
+      args.pinnedDisplayPolicy,
+      worktreeFolders
     ]
   )
   const orderedHostOptions = useMemo(

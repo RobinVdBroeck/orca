@@ -45,12 +45,12 @@ describe('getWorktreeDragUnitGroups', () => {
   it('ignores imported worktree card rows without splitting drag groups', () => {
     const groups = getWorktreeDragUnitGroups([
       header('repo:one'),
-      item('main'),
+      item('main', 0, 'repo:one'),
       importedCard(),
-      item('feature'),
+      item('feature', 0, 'repo:one'),
       header('repo:two'),
       importedCard(),
-      item('other')
+      item('other', 0, 'repo:two')
     ])
 
     expect(groups).toEqual([

@@ -5,6 +5,7 @@ import { getFullDropIndexForWorktreeDragUnit } from '../../worktree-drag-units'
 import { getWorktreeSidebarDragRectsForGroup } from '../../worktree-sidebar-drag-autoscroll'
 import { getWorktreeSidebarDragGrab } from '../../worktree-sidebar-drag-geometry'
 import { getPointerDropStatusTarget } from './status-target'
+import { getWorktreeFolderDropTargetKey } from '../../worktree-folder-drop-target'
 import type { WorktreeDropCommitContext } from './drop-commit-context'
 import type { WorktreeDragRuntime } from './use-runtime'
 import type { WorktreeDragSession } from './use-session'
@@ -29,7 +30,8 @@ export function useWorktreeNativeDrag(args: {
     nativeLatestPointRef,
     clearWorktreeDrag,
     setWorktreeDragState,
-    setNativeLineageDropTargetId
+    setNativeLineageDropTargetId,
+    setFolderDragOverKey
   } = runtime
 
   const startWorktreeNativeAutoscroll = useWorktreeNativeDragAutoscroll({
@@ -93,7 +95,7 @@ export function useWorktreeNativeDrag(args: {
         clearWorktreeDrag()
         return
       }
-      const target = ctx.getEligibleLineageDropTarget(
+      const target = ctx.getEligibleDropTarget(
         getPointerDropStatusTarget({
           container: event.currentTarget,
           x: event.clientX,
@@ -109,6 +111,14 @@ export function useWorktreeNativeDrag(args: {
         return
       }
       setNativeLineageDropTargetId(null)
+      if (target.folderDrop) {
+        event.preventDefault()
+        event.dataTransfer.dropEffect = 'move'
+        setFolderDragOverKey(getWorktreeFolderDropTargetKey(target.folderDrop))
+        setWorktreeDragState((prev) => clearWorktreeDropPreview(prev, { pointerY: event.clientY }))
+        return
+      }
+      setFolderDragOverKey(null)
 
       const drop = ctx.computeWorktreeDrop(event.clientY)
       if (!drop) {
@@ -141,6 +151,7 @@ export function useWorktreeNativeDrag(args: {
       ctx,
       nativeLatestPointRef,
       session,
+      setFolderDragOverKey,
       setNativeLineageDropTargetId,
       setWorktreeDragState,
       startWorktreeNativeAutoscroll
@@ -164,7 +175,7 @@ export function useWorktreeNativeDrag(args: {
       }
 
       const container = scrollRef.current
-      const target = ctx.getEligibleLineageDropTarget(
+      const target = ctx.getEligibleDropTarget(
         container
           ? getPointerDropStatusTarget({
               container,
@@ -179,6 +190,13 @@ export function useWorktreeNativeDrag(args: {
         event.preventDefault()
         event.stopPropagation()
         ctx.commitWorktreeLineageParentDrop(dragSession.draggedIds, target.lineageParentId)
+        clearWorktreeDrag()
+        return
+      }
+      if (target.folderDrop) {
+        event.preventDefault()
+        event.stopPropagation()
+        ctx.commitWorktreeFolderDrop(dragSession.draggedIds, target.folderDrop)
         clearWorktreeDrag()
         return
       }

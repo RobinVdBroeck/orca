@@ -146,6 +146,10 @@ const UiUpdateFields = z
     // Why: rides App.tsx's debounced writer, so omitting it rejected that entire
     // payload (sidebar widths, filters, agent acks) for every paired client.
     showDotfilesByWorktree: z.record(z.string(), z.boolean()).optional(),
+    sidebarWorktreeFoldersByRepoId: z
+      .record(z.string(), z.array(z.object({ id: z.string(), name: z.string() }).strict()))
+      .optional(),
+    sidebarWorktreeFolderIdByWorktree: z.record(z.string(), z.string()).optional(),
     collapsedGroups: StringArray.optional(),
     uiZoomLevel: z.number().finite().optional(),
     editorFontZoomLevel: z.number().finite().optional(),

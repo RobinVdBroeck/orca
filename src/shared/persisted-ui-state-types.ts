@@ -25,6 +25,10 @@ import type {
 } from './ui-chrome-types'
 import type { WorkspaceStatusDefinition } from './worktree/types'
 import type { PersistedAutomationHostFilter } from './automation-host-filter'
+import type {
+  SidebarWorktreeFolderIdByWorktree,
+  SidebarWorktreeFoldersByRepoId
+} from './sidebar-worktree-folders'
 
 export type PersistedUIState = {
   lastActiveRepoId: string | null
@@ -74,6 +78,10 @@ export type PersistedUIState = {
   alwaysShowDefaultBranchWorkspace?: boolean
   /** Per-worktree Explorer dotfile visibility. Missing entries inherit the default: show. */
   showDotfilesByWorktree?: Record<string, boolean>
+  /** Sidebar folders per project; client-side grouping only (see sidebar-worktree-folders.ts). */
+  sidebarWorktreeFoldersByRepoId?: SidebarWorktreeFoldersByRepoId
+  /** Sidebar folder placement per worktree id; absent = project root. */
+  sidebarWorktreeFolderIdByWorktree?: SidebarWorktreeFolderIdByWorktree
   filterRepoIds: string[]
   /** Agents-view host scope; deliberately separate from visibleWorkspaceHostIds so a monitoring surface never inherits nav filters silently. `null` = all hosts. */
   agentsVisibleHostIds?: VisibleWorkspaceHostIds

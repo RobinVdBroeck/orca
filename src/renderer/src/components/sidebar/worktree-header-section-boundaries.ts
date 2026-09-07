@@ -54,7 +54,8 @@ function indexBucketSuccessors(
 function findNextHeaderRenderRowIndex(rows: readonly RenderRow[], startIndex: number): number {
   for (let index = startIndex; index < rows.length; index++) {
     const row = rows[index]
-    if (row?.type === 'header' || row?.type === 'host-header') {
+    // Why: worktree folder headers live inside a repo section, so they never end one.
+    if ((row?.type === 'header' && !row.worktreeFolder) || row?.type === 'host-header') {
       return index
     }
   }
@@ -74,7 +75,7 @@ function findProjectGroupSectionEndIndex(
     if (row.type === 'host-header') {
       return index
     }
-    if (row.type !== 'header') {
+    if (row.type !== 'header' || row.worktreeFolder) {
       continue
     }
     const rowDepth = row.projectGroupDepth ?? 0

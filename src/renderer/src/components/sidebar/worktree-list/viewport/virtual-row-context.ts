@@ -82,6 +82,7 @@ export function buildWorktreeVirtualRowContext(args: BuildArgs): WorktreeVirtual
       highlightedRevealRowKey: reveal.highlightedRevealRowKey,
       dragOverStatus: runtime.dragOverStatus,
       pinDragOver: runtime.pinDragOver,
+      folderDragOverKey: runtime.folderDragOverKey,
       headerDrag,
       getCachedFolderWorkspacePathStatus: args.getCachedFolderWorkspacePathStatus,
       toggleGroupWithScrollAnchor: args.toggleGroupWithScrollAnchor,
@@ -98,7 +99,8 @@ export function buildWorktreeVirtualRowContext(args: BuildArgs): WorktreeVirtual
         onMoveProjectToGroup: props.handleMoveProjectToGroup,
         onRemoveProjectFromGroup: props.handleRemoveProjectFromGroup,
         onRemoveProject: props.handleRemoveProject,
-        onCreateForRepo: props.handleCreateForRepo
+        onCreateForRepo: props.handleCreateForRepo,
+        onCreateWorktreeFolder: props.handleCreateWorktreeFolder
       },
       onRenameProjectGroup: props.handleRenameProjectGroup,
       onDeleteProjectGroup: props.handleDeleteProjectGroup,
@@ -108,6 +110,14 @@ export function buildWorktreeVirtualRowContext(args: BuildArgs): WorktreeVirtual
       onWorkspacePinDragOver: statusDrag.handleWorkspacePinDragOver,
       onWorkspacePinDragLeave: statusDrag.handleWorkspacePinDragLeave,
       onWorkspaceStatusDrop: statusDrag.handleWorkspaceStatusDrop
+    },
+    worktreeFolderHeader: {
+      collapsedGroups: props.collapsedGroups,
+      highlightedRevealRowKey: reveal.highlightedRevealRowKey,
+      folderDragOverKey: runtime.folderDragOverKey,
+      toggleGroupWithScrollAnchor: args.toggleGroupWithScrollAnchor,
+      onRenameWorktreeFolder: props.handleRenameWorktreeFolder,
+      onDeleteWorktreeFolder: props.handleDeleteWorktreeFolder
     },
     item: {
       settings: args.settings,

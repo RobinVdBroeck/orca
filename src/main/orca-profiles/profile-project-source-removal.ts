@@ -35,13 +35,36 @@ export function removeSourceRepo(
           ? null
           : state.ui.lastActiveWorktreeId,
       filterRepoIds: state.ui.filterRepoIds?.filter((id) => id !== repoId) ?? [],
-      showDotfilesByWorktree: removeRepoWorktreeRecord(state.ui.showDotfilesByWorktree, repoId)
+      showDotfilesByWorktree: removeRepoWorktreeRecord(state.ui.showDotfilesByWorktree, repoId),
+      ...removeRepoSidebarWorktreeFolders(state.ui, repoId)
     }
   }
   delete next.sparsePresetsByRepo[repoId]
   delete next.retiredWorktreeNamesByRepo?.[repoId]
   removeRepoWorktreeMetadata(next, repoId)
   return rebuildRepoBackedProjectState(next)
+}
+
+function removeRepoSidebarWorktreeFolders(
+  ui: TransferProfileState['ui'],
+  repoId: string
+): Pick<
+  TransferProfileState['ui'],
+  'sidebarWorktreeFoldersByRepoId' | 'sidebarWorktreeFolderIdByWorktree'
+> {
+  const foldersByRepoId = { ...ui.sidebarWorktreeFoldersByRepoId }
+  const removedFolderIds = new Set((foldersByRepoId[repoId] ?? []).map((folder) => folder.id))
+  delete foldersByRepoId[repoId]
+  const membership = removeRepoWorktreeRecord(ui.sidebarWorktreeFolderIdByWorktree, repoId)
+  for (const [worktreeId, folderId] of Object.entries(membership)) {
+    if (removedFolderIds.has(folderId)) {
+      delete membership[worktreeId]
+    }
+  }
+  return {
+    sidebarWorktreeFoldersByRepoId: foldersByRepoId,
+    sidebarWorktreeFolderIdByWorktree: membership
+  }
 }
 
 function removeRepoWorktreeMetadata(state: TransferProfileState, repoId: string): void {

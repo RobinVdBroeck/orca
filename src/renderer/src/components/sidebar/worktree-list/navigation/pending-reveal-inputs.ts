@@ -9,6 +9,7 @@ import type { WorkspaceStatusDefinition, Worktree } from '../../../../../../shar
 import type { WorktreeLineage } from '../../../../../../shared/worktree/lineage-types'
 import type { ExecutionHostId } from '../../../../../../shared/execution-host'
 import { getWorktreeExecutionHostId } from '../../../../../../shared/execution-host'
+import type { SidebarWorktreeFolderIdByWorktree } from '../../../../../../shared/sidebar-worktree-folders'
 import type { RenderRow } from '../listing/render-row'
 import { getWorktreeLineageGroupKey } from '../grouping/group-keys'
 import type { ProjectGroupingModel } from '../grouping/project-grouping'
@@ -45,6 +46,7 @@ export type PendingSidebarRevealArgs = {
   settings: AppState['settings']
   projectGroups: readonly ProjectGroup[]
   projectGrouping?: ProjectGroupingModel
+  sidebarWorktreeFolderIdByWorktree: SidebarWorktreeFolderIdByWorktree
   flashRevealedRow: (rowKey: string) => void
   markRevealScroll: (targetTop: number) => void
   schedulePendingRevealFrame: (callback: FrameRequestCallback) => void
@@ -135,7 +137,8 @@ export function expandGroupsForWorktreeReveal(
           args.workspaceStatuses,
           args.settings,
           args.projectGroups,
-          args.projectGrouping
+          args.projectGrouping,
+          args.sidebarWorktreeFolderIdByWorktree
         )
   for (const groupKey of groupKeys) {
     if (args.collapsedGroups.has(groupKey)) {

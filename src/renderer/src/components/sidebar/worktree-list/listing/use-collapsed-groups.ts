@@ -11,6 +11,7 @@ import { getGroupKeysForWorktree } from '../grouping/worktree-group-keys'
 import { getFolderWorkspaceRevealGroupKeys } from '../navigation/folder-reveal'
 import type { FolderWorkspace } from '../../../../../../shared/folder-workspace-types'
 import type { ExecutionHostId } from '../../../../../../shared/execution-host'
+import type { SidebarWorktreeFolderIdByWorktree } from '../../../../../../shared/sidebar-worktree-folders'
 import { isPinnedSectionWorktree } from '../../pinned-section-worktrees'
 import { getWorktreeLineageAncestors } from '../../worktree-lineage-projection'
 
@@ -31,8 +32,10 @@ export function useEffectiveCollapsedGroups(args: {
   projectGrouping: ProjectGroupingModel
   folderWorkspaces: readonly FolderWorkspace[]
   defaultHostId: ExecutionHostId
+  sidebarWorktreeFolderIdByWorktree: SidebarWorktreeFolderIdByWorktree
 }): Set<string> {
   const {
+    sidebarWorktreeFolderIdByWorktree,
     collapsedGroups,
     agentSendTargetWorktreeId,
     groupBy,
@@ -87,7 +90,8 @@ export function useEffectiveCollapsedGroups(args: {
         workspaceStatuses,
         settings,
         projectGroups,
-        projectGrouping
+        projectGrouping,
+        sidebarWorktreeFolderIdByWorktree
       )) {
         next.delete(groupKey)
       }
@@ -116,6 +120,7 @@ export function useEffectiveCollapsedGroups(args: {
     worktreeLineageById,
     worktreeMap,
     folderWorkspaces,
-    defaultHostId
+    defaultHostId,
+    sidebarWorktreeFolderIdByWorktree
   ])
 }

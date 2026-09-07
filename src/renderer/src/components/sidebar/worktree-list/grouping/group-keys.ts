@@ -1,4 +1,4 @@
-import { CircleX, FolderTree, List, Pin } from 'lucide-react'
+import { CircleX, Folder, FolderTree, List, Pin } from 'lucide-react'
 import type React from 'react'
 import type { Repo } from '../../../../../../shared/repo-types'
 import type { Worktree } from '../../../../../../shared/worktree/types'
@@ -93,6 +93,17 @@ export const ALL_GROUP_META = {
   },
   tone: 'text-foreground',
   icon: List
+} as const
+
+export const WORKTREE_FOLDER_GROUP_PREFIX = 'folder:'
+
+export function getWorktreeFolderGroupKey(folderId: string): string {
+  return `${WORKTREE_FOLDER_GROUP_PREFIX}${folderId}`
+}
+
+export const WORKTREE_FOLDER_META = {
+  tone: 'text-muted-foreground',
+  icon: Folder
 } as const
 
 export const LINEAGE_GROUP_PREFIX = 'lineage:'

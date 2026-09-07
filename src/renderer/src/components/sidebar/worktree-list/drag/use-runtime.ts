@@ -27,6 +27,8 @@ export function useWorktreeDragRuntime(args: {
   const [dragOverStatus, setDragOverStatus] = useState<WorkspaceStatus | null>(null)
   const [pinDragOver, setPinDragOver] = useState(false)
   const [nativeLineageDropTargetId, setNativeLineageDropTargetId] = useState<string | null>(null)
+  // Why: folder/repo headers highlight while a card hovers them; see getWorktreeFolderDropTargetKey.
+  const [folderDragOverKey, setFolderDragOverKey] = useState<string | null>(null)
   const [worktreeDragState, setWorktreeDragState] = useState<WorktreeRowDragState>(
     WORKTREE_ROW_DRAG_INITIAL_STATE
   )
@@ -59,6 +61,7 @@ export function useWorktreeDragRuntime(args: {
     const drag = worktreePointerDragRef.current
     cancelWorktreePointerAutoscroll()
     setNativeLineageDropTargetId(null)
+    setFolderDragOverKey(null)
     if (!drag) {
       return
     }
@@ -97,6 +100,8 @@ export function useWorktreeDragRuntime(args: {
       setPinDragOver,
       nativeLineageDropTargetId,
       setNativeLineageDropTargetId,
+      folderDragOverKey,
+      setFolderDragOverKey,
       worktreeDragState,
       setWorktreeDragState,
       worktreePointerDragRef,
@@ -115,6 +120,7 @@ export function useWorktreeDragRuntime(args: {
       cancelWorktreePointerAutoscroll,
       clearWorktreeDrag,
       dragOverStatus,
+      folderDragOverKey,
       nativeLineageDropTargetId,
       pinDragOver,
       worktreeDragState

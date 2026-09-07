@@ -3,6 +3,7 @@ import {
   CircleX,
   Ellipsis,
   Eye,
+  Folder,
   FolderInput,
   FolderPlus,
   Plus,
@@ -65,6 +66,7 @@ export type RepoHeaderProjectActions = {
   onRemoveProjectFromGroup: (repo: Repo) => void
   onRemoveProject: (repo: Repo) => void
   onCreateForRepo: (projectId: string) => void
+  onCreateWorktreeFolder: (repo: Repo) => void
 }
 
 export function RepoHeaderProjectActionsMenu({
@@ -134,6 +136,10 @@ export function RepoHeaderProjectActionsMenu({
             {getWorktreeVisibilityMenuLabel(repo, actions.getWorktreeVisibilityDefaults(repo))}
           </DropdownMenuItem>
         ) : null}
+        <DropdownMenuItem onSelect={() => actions.onCreateWorktreeFolder(repo)}>
+          <Folder className="size-3.5" />
+          {translate('auto.components.sidebar.WorktreeList.newWorktreeFolder', 'New folder…')}
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => actions.onCreateGroupFromRepo(repo)}>
           <FolderPlus className="size-3.5" />
           {translate('auto.components.sidebar.WorktreeList.cbfd565f83', 'New group from project')}

@@ -8,9 +8,11 @@ import { ProjectGroupDeleteDialog } from '../../ProjectGroupDeleteDialog'
 import SuppressExternalWorktreeInboxDialog from '../../SuppressExternalWorktreeInboxDialog'
 import type { NewExternalWorktreesInboxActionState } from '../../new-external-worktrees-inbox-actions'
 import type { ProjectGroupDialogs } from './use-project-group-dialogs'
+import type { WorktreeFolderDialogs } from './use-worktree-folder-dialogs'
 
 export function SidebarWorktreeListDialogs({
   dialogs,
+  folderDialogs,
   repos,
   settings,
   suppressExternalWorktreeInboxRepoId,
@@ -20,6 +22,7 @@ export function SidebarWorktreeListDialogs({
   onOpenWorktreeVisibility
 }: {
   dialogs: ProjectGroupDialogs
+  folderDialogs: WorktreeFolderDialogs
   repos: readonly Repo[]
   settings: AppState['settings']
   suppressExternalWorktreeInboxRepoId: string | null
@@ -63,6 +66,35 @@ export function SidebarWorktreeListDialogs({
           }
         }}
         onSubmit={dialogs.handleSubmitProjectGroupName}
+      />
+      <ProjectGroupNameDialog
+        open={folderDialogs.nameDialog !== null}
+        title={
+          folderDialogs.nameDialog?.type === 'rename'
+            ? translate('auto.components.sidebar.WorktreeList.renameFolderTitle', 'Rename Folder')
+            : translate('auto.components.sidebar.WorktreeList.newFolderTitle', 'New Folder')
+        }
+        description={
+          folderDialogs.nameDialog?.type === 'rename'
+            ? translate(
+                'auto.components.sidebar.WorktreeList.renameFolderDescription',
+                'Update the folder name shown in the sidebar.'
+              )
+            : translate(
+                'auto.components.sidebar.WorktreeList.newFolderDescription',
+                'Group workspaces of this project under a folder in the sidebar.'
+              )
+        }
+        initialName={
+          folderDialogs.nameDialog?.type === 'rename' ? folderDialogs.nameDialog.currentName : ''
+        }
+        confirmLabel={folderDialogs.nameDialog?.type === 'rename' ? 'Rename' : 'Create'}
+        onOpenChange={(open) => {
+          if (!open) {
+            folderDialogs.setNameDialog(null)
+          }
+        }}
+        onSubmit={folderDialogs.handleSubmitWorktreeFolderName}
       />
       <SuppressExternalWorktreeInboxDialog
         open={suppressExternalWorktreeInboxRepoId !== null}

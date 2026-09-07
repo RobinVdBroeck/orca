@@ -162,6 +162,8 @@ export function usePersistedUIWriter(): void {
       hideWorkspacesFromOtherDevices: s.hideWorkspacesFromOtherDevices,
       alwaysShowDefaultBranchWorkspace: s.alwaysShowDefaultBranchWorkspace,
       showDotfilesByWorktree: s.showDotfilesByWorktree,
+      sidebarWorktreeFoldersByRepoId: s.sidebarWorktreeFoldersByRepoId,
+      sidebarWorktreeFolderIdByWorktree: s.sidebarWorktreeFolderIdByWorktree,
       filterRepoIds: s.filterRepoIds,
       // Why: dashboard auto-acks (fire on focus/visibility) and the in-memory ack cleanup
       // paths in agent-status.ts (close/dismiss) flow to disk through map identity changes.

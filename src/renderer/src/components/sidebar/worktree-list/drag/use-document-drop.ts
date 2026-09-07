@@ -28,7 +28,7 @@ export function useWorktreeDocumentDrop(args: {
       const drop = ctx.computeWorktreeDrop(event.clientY)
       if (!drop) {
         const container = ctx.scrollRef.current
-        const target = ctx.getEligibleLineageDropTarget(
+        const target = ctx.getEligibleDropTarget(
           container
             ? getPointerDropStatusTarget({
                 container,
@@ -42,6 +42,13 @@ export function useWorktreeDocumentDrop(args: {
           event.preventDefault()
           event.stopPropagation()
           ctx.commitWorktreeLineageParentDrop(session.draggedIds, target.lineageParentId)
+          clearWorktreeDrag()
+          return
+        }
+        if (target.folderDrop) {
+          event.preventDefault()
+          event.stopPropagation()
+          ctx.commitWorktreeFolderDrop(session.draggedIds, target.folderDrop)
           clearWorktreeDrag()
           return
         }

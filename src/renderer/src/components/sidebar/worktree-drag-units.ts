@@ -19,44 +19,36 @@ export function getWorktreeDragUnitGroups(
   rows: readonly WorktreeDragUnitRow[]
 ): WorktreeDragUnitGroup[] {
   const groups: WorktreeDragUnitGroup[] = []
-  let current: { key: string; units: WorktreeDragUnitGroup['units'] } | null = null
+  const unitsByKey = new Map<string, WorktreeDragUnitGroup['units']>()
   const naturalWorktreeIds = getNaturalWorktreeIds(rows)
+  const ensureGroup = (key: string): WorktreeDragUnitGroup['units'] => {
+    let units = unitsByKey.get(key)
+    if (!units) {
+      units = []
+      unitsByKey.set(key, units)
+      groups.push({ key, units, worktreeIds: [] })
+    }
+    return units
+  }
 
   for (const row of rows) {
     if (row.type === 'header') {
-      current = { key: row.key, units: [] }
-      groups.push({
-        key: current.key,
-        units: current.units,
-        worktreeIds: current.units.map((unit) => unit.worktreeId)
-      })
+      ensureGroup(row.key)
       continue
     }
-    if (
-      row.type === 'host-header' ||
-      row.type === 'imported-worktrees-card' ||
-      row.type === 'new-external-worktrees-inbox' ||
-      row.type === 'pending-creation' ||
-      row.type === 'folder-workspace'
-    ) {
+    if (row.type !== 'item') {
       continue
     }
     if (row.sectionKey === PINNED_GROUP_KEY && naturalWorktreeIds.has(row.worktree.id)) {
       continue
     }
-    if (!current) {
-      current = { key: ALL_GROUP_KEY, units: [] }
-      groups.push({
-        key: current.key,
-        units: current.units,
-        worktreeIds: current.units.map((unit) => unit.worktreeId)
-      })
-    }
-    if (row.depth > 0 && current.units.length > 0) {
-      current.units.at(-1)!.worktreeIds.push(row.worktree.id)
+    // Why: a repo section's root rows follow its folder headers, so "last header seen" is wrong.
+    const units = ensureGroup(row.sectionKey || ALL_GROUP_KEY)
+    if (row.depth > 0 && units.length > 0) {
+      units.at(-1)!.worktreeIds.push(row.worktree.id)
       continue
     }
-    current.units.push({ worktreeId: row.worktree.id, worktreeIds: [row.worktree.id] })
+    units.push({ worktreeId: row.worktree.id, worktreeIds: [row.worktree.id] })
   }
 
   return groups

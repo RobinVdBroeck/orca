@@ -21,6 +21,21 @@ export function WorktreeContextMenuOverlays({ model }: { model: WorktreeContextM
         onOpenChange={model.handleCreateGroupDialogOpenChange}
         onSubmit={model.handleSubmitNewProjectGroup}
       />
+      <ProjectGroupNameDialog
+        open={model.createFolderDialogOpen}
+        title={translate(
+          'auto.components.sidebar.WorktreeContextMenu.newFolderTitle',
+          'New Folder'
+        )}
+        description={translate(
+          'auto.components.sidebar.WorktreeContextMenu.newFolderDescription',
+          'Create a sidebar folder and move the selected workspaces into it.'
+        )}
+        initialName=""
+        confirmLabel="Create"
+        onOpenChange={model.handleCreateWorktreeFolderDialogOpenChange}
+        onSubmit={model.handleSubmitNewWorktreeFolder}
+      />
       {model.parentPicker ? (
         <WorktreeParentPickerPopover
           open={model.parentPickerOpen}

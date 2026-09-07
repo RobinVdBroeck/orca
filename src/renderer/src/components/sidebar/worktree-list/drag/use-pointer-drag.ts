@@ -58,7 +58,8 @@ export function useWorktreePointerDrag(args: {
     suppressWorktreeClickUntilRef,
     setWorktreeDragState,
     setDragOverStatus,
-    setPinDragOver
+    setPinDragOver,
+    setFolderDragOverKey
   } = runtime
 
   const flushWorktreePointerDrag = useCallback(() => {
@@ -75,13 +76,15 @@ export function useWorktreePointerDrag(args: {
       shouldShowWorkspaceBoardDropIndicator,
       setWorktreeDragState,
       setDragOverStatus,
-      setPinDragOver
+      setPinDragOver,
+      setFolderDragOverKey
     })
   }, [
     ctx,
     onWorkspaceBoardDragPreviewCommit,
     onWorkspaceBoardDragPreviewStart,
     setDragOverStatus,
+    setFolderDragOverKey,
     setPinDragOver,
     setWorktreeDragState,
     shouldShowWorkspaceBoardDropIndicator,

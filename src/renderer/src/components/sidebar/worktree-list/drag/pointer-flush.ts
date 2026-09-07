@@ -7,6 +7,7 @@ import {
   updateWorkspaceKanbanSidebarDropTargetVisual
 } from '../../workspace-kanban-sidebar-drop'
 import { updateSidebarDragPreviewPosition } from '../../worktree-sidebar-pointer-drag-dom'
+import { getWorktreeFolderDropTargetKey } from '../../worktree-folder-drop-target'
 import { getPointerDropStatusTarget, shouldPreferSidebarStatusDropTarget } from './status-target'
 import type { WorktreeDropCommitContext } from './drop-commit-context'
 import {
@@ -32,6 +33,7 @@ export type WorktreePointerDragFrameArgs = {
   setWorktreeDragState: React.Dispatch<React.SetStateAction<WorktreeRowDragState>>
   setDragOverStatus: (status: WorkspaceStatus | null) => void
   setPinDragOver: (pinDragOver: boolean) => void
+  setFolderDragOverKey: (key: string | null) => void
 }
 
 // Reflect a status/pin hover that has no insertion line of its own.
@@ -52,6 +54,7 @@ function showStatusHoverWithoutInsertionLine(
     clearWorkspaceKanbanSidebarDropTargetVisual()
     args.setDragOverStatus(null)
     args.setPinDragOver(false)
+    args.setFolderDragOverKey(null)
     args.setWorktreeDragState((prev) =>
       applyWorktreeDropPreview(prev, statusDrop, {
         pointerY: drag.currentY,
@@ -62,6 +65,7 @@ function showStatusHoverWithoutInsertionLine(
   }
   args.setDragOverStatus(target.status)
   args.setPinDragOver(target.isPinDrop)
+  args.setFolderDragOverKey(null)
   args.setWorktreeDragState((prev) =>
     clearWorktreeDropPreview(prev, { pointerY: drag.currentY, matchPointerY: true })
   )
@@ -70,6 +74,7 @@ function showStatusHoverWithoutInsertionLine(
 function clearInsertionLine(args: WorktreePointerDragFrameArgs): void {
   args.setDragOverStatus(null)
   args.setPinDragOver(false)
+  args.setFolderDragOverKey(null)
   args.setWorktreeDragState((prev) =>
     clearWorktreeDropPreview(prev, { pointerY: args.drag.currentY, matchPointerY: true })
   )
@@ -127,7 +132,7 @@ export function flushWorktreePointerDragFrame(args: WorktreePointerDragFrameArgs
   }
 
   const sidebarContainer = ctx.scrollRef.current
-  const preferredStatusTarget = ctx.getEligibleLineageDropTarget(
+  const preferredStatusTarget = ctx.getEligibleDropTarget(
     sidebarContainer
       ? getPointerDropStatusTarget({
           container: sidebarContainer,
@@ -141,6 +146,13 @@ export function flushWorktreePointerDragFrame(args: WorktreePointerDragFrameArgs
     updateLatestWorktreeStatusDropTarget(drag, preferredStatusTarget, null)
     clearWorkspaceKanbanSidebarDropTargetVisual()
     clearInsertionLine(args)
+    return
+  }
+  if (preferredStatusTarget.folderDrop) {
+    updateLatestWorktreeStatusDropTarget(drag, preferredStatusTarget, null)
+    clearWorkspaceKanbanSidebarDropTargetVisual()
+    clearInsertionLine(args)
+    args.setFolderDragOverKey(getWorktreeFolderDropTargetKey(preferredStatusTarget.folderDrop))
     return
   }
   if (
@@ -163,6 +175,7 @@ export function flushWorktreePointerDragFrame(args: WorktreePointerDragFrameArgs
   clearWorkspaceKanbanSidebarDropTargetVisual()
   args.setDragOverStatus(null)
   args.setPinDragOver(false)
+  args.setFolderDragOverKey(null)
   args.setWorktreeDragState((prev) =>
     applyWorktreeDropPreview(prev, drop, { pointerY: drag.currentY, matchPointerY: true })
   )

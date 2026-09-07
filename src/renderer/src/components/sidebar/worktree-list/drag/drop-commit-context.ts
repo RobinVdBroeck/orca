@@ -6,6 +6,7 @@ import type {
 import type { WorktreeDragGroup } from '../../worktree-manual-order'
 import type { WorktreeDragUnitGroup } from '../../worktree-drag-units'
 import type { WorktreeSidebarDropPreview } from '../../worktree-sidebar-drop-preview'
+import type { WorktreeFolderDropTarget } from '../../worktree-folder-drop-target'
 import type { WorktreeStatusDropRequest } from './use-session'
 import type { WorktreeSidebarLineageDropTarget } from './row-state'
 
@@ -29,11 +30,16 @@ export type WorktreeDropCommitContext = {
     request: WorktreeStatusDropRequest
   ) => WorktreeSidebarDropPreview | null
   refreshWorktreeDragSession: () => boolean
-  getEligibleLineageDropTarget: (
+  /** Strips lineage and folder targets the dragged set cannot land on. */
+  getEligibleDropTarget: (
     target: WorktreeSidebarLineageDropTarget,
     draggedIds: readonly string[]
   ) => WorktreeSidebarLineageDropTarget
   commitWorktreeLineageParentDrop: (draggedIds: readonly string[], parentId: string) => boolean
+  commitWorktreeFolderDrop: (
+    draggedIds: readonly string[],
+    target: WorktreeFolderDropTarget
+  ) => void
   clearReorderedWorktreeParents: (args: {
     draggedIds: readonly string[]
     sourceGroupKey: string

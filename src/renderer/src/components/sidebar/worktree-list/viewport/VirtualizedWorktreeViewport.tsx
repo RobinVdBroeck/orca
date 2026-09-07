@@ -18,6 +18,7 @@ import { useWorktreeDragRuntime } from '../drag/use-runtime'
 import { useWorktreeDragSession } from '../drag/use-session'
 import { useWorktreeDocumentDrop } from '../drag/use-document-drop'
 import { useWorktreeLineageDropCommit } from '../drag/use-lineage-drop-commit'
+import { useWorktreeFolderDropCommit } from '../drag/use-folder-drop-commit'
 import { useWorktreeListKeyboardNavigation } from '../navigation/use-keyboard'
 import { useWorktreeListVirtualizer } from './use-virtualizer'
 import { useWorktreeNativeDrag } from '../drag/use-native-drag'
@@ -58,6 +59,7 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
   const settings = useAppStore((s) => s.settings)
   const worktreeVisibilityDefaultsByHost = useAppStore((s) => s.worktreeVisibilityDefaultsByHost)
   const sshConnectionStates = useAppStore((s) => s.sshConnectionStates)
+  const sidebarWorktreeFolderIdByWorktree = useAppStore((s) => s.sidebarWorktreeFolderIdByWorktree)
   const newCardStyle = settings?.experimentalNewWorktreeCardStyle === true
 
   const reveal = useSidebarRevealHighlight()
@@ -102,6 +104,7 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
     worktreeLineageById,
     worktreeDragGroups: session.worktreeDragGroups
   })
+  const folderDrop = useWorktreeFolderDropCommit({ worktreeMap })
   const runtime = useWorktreeDragRuntime({
     worktreeDragSessionRef: session.worktreeDragSessionRef,
     statusDropAnchorsRef: session.statusDropAnchorsRef,
@@ -161,6 +164,7 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
     settings,
     projectGroups,
     projectGrouping: props.projectGrouping,
+    sidebarWorktreeFolderIdByWorktree,
     flashRevealedRow: reveal.flashRevealedRow,
     markRevealScroll: scrollSuppression.markRevealScroll,
     schedulePendingRevealFrame: reveal.schedulePendingRevealFrame,
@@ -199,6 +203,7 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
     workspaceStatuses,
     session,
     lineageDrop,
+    folderDrop,
     runtime,
     onMoveWorktreesToStatus: props.onMoveWorktreesToStatus,
     onMoveWorktreesToStatusAtIndex: props.onMoveWorktreesToStatusAtIndex,

@@ -31,6 +31,8 @@ import {
 import { useWorktreeContextMenuCommands } from './use-worktree-context-menu-commands'
 import { useWorktreeParentPickerTransition } from './use-worktree-parent-picker-transition'
 import { useWorktreeContextMenuSecondaryActions } from './use-worktree-context-menu-secondary-actions'
+import { useWorktreeContextMenuFolderActions } from './use-worktree-context-menu-folder-actions'
+import { useWorktreeContextMenuLifecycle } from './use-worktree-context-menu-lifecycle'
 
 export type WorktreeContextMenuProps = {
   worktree: Worktree
@@ -237,32 +239,17 @@ export function useWorktreeContextMenuModel({
     [onOpenChange]
   )
 
-  useEffect(() => {
-    if (!onLifecycleComplete) {
-      return
-    }
-    if (menuOpen) {
-      lifecycleStartedRef.current = true
-    }
-    if (
-      !lifecycleStartedRef.current ||
-      menuOpen ||
-      createGroupDialogOpen ||
-      createGroupDialogActiveRef.current ||
-      parentPicker !== null ||
-      pendingParentPickerRef.current !== null
-    ) {
-      return
-    }
-    const timer = window.setTimeout(() => {
-      if (createGroupDialogActiveRef.current || pendingParentPickerRef.current !== null) {
-        return
-      }
-      lifecycleStartedRef.current = false
-      onLifecycleComplete?.()
-    }, 0)
-    return () => window.clearTimeout(timer)
-  }, [createGroupDialogOpen, menuOpen, onLifecycleComplete, parentPicker])
+  const folderActions = useWorktreeContextMenuFolderActions({ activeContextWorktrees, repo })
+  useWorktreeContextMenuLifecycle({
+    onLifecycleComplete,
+    menuOpen,
+    dialogsOpen: createGroupDialogOpen || folderActions.createFolderDialogOpen,
+    createGroupDialogActiveRef,
+    createFolderDialogActiveRef: folderActions.createFolderDialogActiveRef,
+    parentPickerOpen: parentPicker !== null,
+    pendingParentPickerRef,
+    lifecycleStartedRef
+  })
 
   useEffect(() => {
     const closeMenu = (): void => setMenuOpenState(false)
@@ -357,6 +344,7 @@ export function useWorktreeContextMenuModel({
   )
 
   return {
+    ...folderActions,
     activeContextWorktrees,
     allWorktrees,
     batchDeleteWorktrees,

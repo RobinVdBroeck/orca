@@ -5,32 +5,31 @@ import type { WorktreeDragGroup } from '../../worktree-manual-order'
 
 export function getWorktreeDragGroups(rows: HostSectionRow[]): WorktreeDragGroup[] {
   const groups: WorktreeDragGroup[] = []
-  let current: { key: string; ids: string[] } | null = null
+  const idsByKey = new Map<string, string[]>()
   const naturalWorktreeIds = getNaturalWorktreeIds(rows)
+  const ensureGroup = (key: string): string[] => {
+    let ids = idsByKey.get(key)
+    if (!ids) {
+      ids = []
+      idsByKey.set(key, ids)
+      groups.push({ key, worktreeIds: ids })
+    }
+    return ids
+  }
 
   for (const row of rows) {
     if (row.type === 'header') {
-      current = { key: row.key, ids: [] }
-      groups.push({ key: current.key, worktreeIds: current.ids })
+      ensureGroup(row.key)
       continue
     }
-    if (
-      row.type === 'host-header' ||
-      row.type === 'imported-worktrees-card' ||
-      row.type === 'new-external-worktrees-inbox' ||
-      row.type === 'pending-creation' ||
-      row.type === 'folder-workspace'
-    ) {
+    if (row.type !== 'item') {
       continue
     }
     if (row.sectionKey === PINNED_GROUP_KEY && naturalWorktreeIds.has(row.worktree.id)) {
       continue
     }
-    if (!current) {
-      current = { key: ALL_GROUP_KEY, ids: [] }
-      groups.push({ key: current.key, worktreeIds: current.ids })
-    }
-    current.ids.push(row.worktree.id)
+    // Why: a repo section's root rows follow its folder headers, so "last header seen" is wrong.
+    ensureGroup(row.sectionKey || ALL_GROUP_KEY).push(row.worktree.id)
   }
 
   return groups.filter((group) => group.worktreeIds.length > 0)

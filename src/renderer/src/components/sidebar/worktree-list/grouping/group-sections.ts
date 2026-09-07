@@ -6,8 +6,17 @@ import {
   getWorkspaceStatusFromGroupKey,
   getWorkspaceStatusVisualMeta
 } from '../../workspace-status'
-import { PROJECT_GROUP_META, PR_GROUP_META } from './group-keys'
+import {
+  PROJECT_GROUP_META,
+  PR_GROUP_META,
+  WORKTREE_FOLDER_META,
+  getWorktreeFolderGroupKey
+} from './group-keys'
 import type { PRGroupKey } from './group-keys'
+import {
+  partitionWorktreesBySidebarFolder,
+  type SidebarWorktreeFolderModel
+} from './worktree-folder-sections'
 import type { NoticeHostContext } from './host-labels'
 import {
   getLaneHostWorktreeCounts,
@@ -50,6 +59,7 @@ export type SectionAppendContext = {
   worktreeMap: Map<string, Worktree>
   nestLineage: boolean
   cyclicLineageIds: ReadonlySet<string>
+  worktreeFolders: SidebarWorktreeFolderModel
 }
 
 export function appendOrderedGroups(
@@ -73,7 +83,8 @@ export function appendOrderedGroups(
     lineageById,
     worktreeMap,
     nestLineage,
-    cyclicLineageIds
+    cyclicLineageIds,
+    worktreeFolders
   } = ctx
   for (const [key, group] of groupsToAppend) {
     const isCollapsed = collapsedGroups.has(key)
@@ -190,7 +201,6 @@ export function appendOrderedGroups(
           }
         }
       }
-      const items = groupBy === 'repo' ? orderMainWorktreeFirst(group.items) : group.items
       const hostContextLabelByRepoId =
         groupBy === 'repo'
           ? getMixedHostContextLabels(group, repoMap, projectIndex, hostLabelById)
@@ -201,15 +211,61 @@ export function appendOrderedGroups(
       // host labels, which are keyed by host-qualified identity.
       const hostContextLabelByWorktreeIdentity =
         groupBy === 'repo' && hostContextLabelByRepoId ? undefined : mixedWorktreeHostContextLabels
-      appendWorktreeRows(result, items, repoMap, lineageById, worktreeMap, {
+      const rowOptions = {
         nestLineage,
         collapsedGroups,
-        groupDepth: projectGroupDepth,
-        sectionKey: key,
         hostContextLabelByRepoId,
         hostContextLabelByWorktreeIdentity,
         cyclicLineageIds
-      })
+      }
+      if (groupBy === 'repo') {
+        // Why: folders are a repo-section concept; status/PR lanes keep membership but never show it.
+        const { folders, rootItems } = partitionWorktreesBySidebarFolder(
+          group.items,
+          group.repoIds.size > 0 ? group.repoIds : repo ? [repo.id] : [],
+          worktreeFolders
+        )
+        for (const section of folders) {
+          const folderKey = getWorktreeFolderGroupKey(section.folder.id)
+          result.push({
+            type: 'header',
+            key: folderKey,
+            label: section.folder.name,
+            count: section.items.length,
+            tone: WORKTREE_FOLDER_META.tone,
+            icon: WORKTREE_FOLDER_META.icon,
+            projectGroupDepth: projectGroupDepth + 1,
+            worktreeFolder: {
+              id: section.folder.id,
+              name: section.folder.name,
+              repoId: section.repoId,
+              repo: repoMap.get(section.repoId)
+            },
+            worktreeIds: section.items.map((worktree) => worktree.id)
+          })
+          if (!collapsedGroups.has(folderKey)) {
+            appendWorktreeRows(result, section.items, repoMap, lineageById, worktreeMap, {
+              ...rowOptions,
+              groupDepth: projectGroupDepth + 1,
+              sectionKey: folderKey
+            })
+          }
+        }
+        appendWorktreeRows(
+          result,
+          orderMainWorktreeFirst(rootItems),
+          repoMap,
+          lineageById,
+          worktreeMap,
+          { ...rowOptions, groupDepth: projectGroupDepth, sectionKey: key }
+        )
+      } else {
+        appendWorktreeRows(result, group.items, repoMap, lineageById, worktreeMap, {
+          ...rowOptions,
+          groupDepth: projectGroupDepth,
+          sectionKey: key
+        })
+      }
       for (const pair of folderPairs) {
         result.push(buildFolderWorkspaceRow(pair, projectGroupDepth))
       }
